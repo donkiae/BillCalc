@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Split the Bill</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #f7f7f8;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --muted: #6b6b70;
+    --border: #e3e3e6;
+    --accent: #d1481e;
+    --accent-bg: #fdece5;
+    --danger: #c2482b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a;
+      --card: #212225;
+      --text: #f0f0f0;
+      --muted: #9a9a9f;
+      --border: #35363a;
+      --accent: #ff8a5c;
+      --accent-bg: #3a2a22;
+      --danger: #ff8a5c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a;
+    --card: #212225;
+    --text: #f0f0f0;
+    --muted: #9a9a9f;
+    --border: #35363a;
+    --accent: #ff8a5c;
+    --accent-bg: #3a2a22;
+    --danger: #ff8a5c;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px 14px 40px;
+    max-width: 640px;
+    margin-inline: auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1 { font-size: 1.4rem; margin: 4px 0 2px; }
+  p.sub { color: var(--muted); margin: 0 0 20px; font-size: 0.9rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card h2 { font-size: 0.95rem; margin: 0 0 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  input[type="text"], input[type="number"] {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 0.95rem;
+    width: 100%;
+  }
+  .people-input { display: flex; gap: 8px; }
+  .people-input input { flex: 1; }
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  button.ghost {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip {
+    background: var(--accent-bg);
+    color: var(--accent);
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .chip button { background: none; color: inherit; padding: 0; font-size: 0.9rem; line-height: 1; }
+  .item {
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    margin-top: 10px;
+  }
+  .item:first-child { border-top: none; margin-top: 0; padding-top: 0; }
+  .item-top { display: flex; gap: 8px; align-items: center; }
+  .item-top input[type="text"] { flex: 2; }
+  .item-top input[type="number"] { flex: 1; }
+  .assign-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  label.tag {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--muted);
+  }
+  label.tag input { display: none; }
+  label.tag.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .settings-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .settings-row label { font-size: 0.85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .settings-row input[type="number"] { width: 70px; }
+  .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+  .charge-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-top: 1px solid var(--border); }
+  .charge-row:first-child { border-top: none; padding-top: 0; }
+  .toggle { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; cursor: pointer; user-select: none; }
+  .toggle input[type="checkbox"] { width: 19px; height: 19px; accent-color: var(--accent); flex-shrink: 0; }
+  .toggle.small { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+  .pct-input { width: 62px !important; text-align: right; }
+  .fx-fields { display: flex; align-items: center; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .fx-fields input[type="text"] { width: 64px !important; text-transform: uppercase; }
+  .fx-fields input[type="number"] { width: 80px !important; }
+  .fx-fields select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 9px 8px;
+    font-size: 0.95rem;
+  }
+  .fx-fields span { font-size: 0.85rem; color: var(--muted); }
+  .hint { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 8px; }
+  .hint a { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 6px 4px; }
+  th { color: var(--muted); font-weight: 500; font-size: 0.78rem; text-transform: uppercase; }
+  tr + tr td { border-top: 1px solid var(--border); }
+  .total-line { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 3px 0; color: var(--muted); }
+  .total-line.grand { color: var(--text); font-weight: 700; font-size: 1.05rem; border-top: 1px solid var(--border); margin-top: 6px; padding-top: 8px; }
+  .empty { color: var(--muted); font-size: 0.85rem; padding: 8px 0; }
+  .overflow-wrap { overflow-x: auto; }
+  @media (max-width: 420px) {
+    body { padding: 16px 10px 32px; }
+    h1 { font-size: 1.25rem; }
+    .card { padding: 13px; border-radius: 12px; }
+    .item-top { flex-wrap: wrap; }
+    .item-top input[type="text"] { flex: 1 1 100%; }
+    .item-top input[type="number"] { flex: 1 1 auto; }
+    table { font-size: 0.82rem; }
+    th, td { padding: 6px 3px; }
+  }
+</style>
+</head>
+<body>
+  <h1>Split the Bill</h1>
+  <p class="sub">A simple way to split the bill with friends.</p>
+
+  <div class="card">
+    <h2>Friends</h2>
+    <div class="people-input">
+      <input type="text" id="personName" placeholder="Name" onkeydown="if(event.key==='Enter')addPerson()">
+      <button onclick="addPerson()">Add</button>
+    </div>
+    <div class="chip-row" id="peopleChips"></div>
+  </div>
+
+  <div class="card">
+    <h2>Charges</h2>
+    <div class="charge-row">
+      <label class="toggle"><input type="checkbox" id="svcOn" checked onchange="toggleField('svcPct','svcOn');render()"> Service charge</label>
+      <input type="number" id="svcPct" class="pct-input" value="10" min="0" step="0.1" oninput="render()">
+    </div>
+    <div class="charge-row">
+      <label class="toggle"><input type="checkbox" id="gstOn" checked onchange="toggleField('gstPct','gstOn');render()"> GST</label>
+      <input type="number" id="gstPct" class="pct-input" value="9" min="0" step="0.1" oninput="render()">
+    </div>
+  </div>
+
+  <div class="card">
+    <label class="toggle"><input type="checkbox" id="currencyOn" onchange="render()"> Paid in another currency</label>
+    <div class="fx-fields" id="currencyFields" style="display:none">
+      <select id="currencyCode" onchange="onCurrencyChange()">
+        <option value="MYR">MYR — Malaysia</option>
+        <option value="USD">USD — US Dollar</option>
+        <option value="IDR">IDR — Indonesia</option>
+        <option value="VND">VND — Vietnam</option>
+        <option value="THB">THB — Thailand</option>
+        <option value="CNY">CNY — China</option>
+        <option value="AUD">AUD — Australia</option>
+        <option value="JPY">JPY — Japan</option>
+        <option value="KRW">KRW — South Korea</option>
+        <option value="EUR">EUR — Euro</option>
+        <option value="GBP">GBP — UK</option>
+        <option value="OTHER">Other…</option>
+      </select>
+      <input type="text" id="currencyCodeCustom" placeholder="e.g. PHP" style="width:64px;text-transform:uppercase;display:none" oninput="render()">
+      <span>=</span>
+      <input type="number" id="fxRate" step="0.0001" value="0.316" oninput="render()">
+      <span>SGD</span>
+    </div>
+    <div id="fxNote" style="display:none">
+      <span id="fxStatus" class="hint">Rates aren't live — please check today's rate and update the number above if it's changed.</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Items</h2>
+    <div id="itemsList"></div>
+    <button style="margin-top:10px" onclick="addItem()">+ Add item</button>
+  </div>
+
+  <div class="card">
+    <h2>Who owes what</h2>
+    <div class="overflow-wrap">
+      <table id="resultsTable"><tbody></tbody></table>
+    </div>
+    <div id="grandTotals" style="margin-top:10px"></div>
+  </div>
+
+  <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:24px;">Developed by Jade :)</p>
+
+<script>
+let people = [];
+let items = []; // {id, name, price, assigned: Set of person names}
+let itemSeq = 0;
+
+// Distinct color per person, assigned in add order and cycled if needed
+const PERSON_COLORS = [
+  { fg: '#2563eb', bg: '#dbeafe' }, // blue
+  { fg: '#db2777', bg: '#fce7f3' }, // pink
+  { fg: '#059669', bg: '#d1fae5' }, // green
+  { fg: '#d97706', bg: '#fef3c7' }, // amber
+  { fg: '#7c3aed', bg: '#ede9fe' }, // purple
+  { fg: '#0891b2', bg: '#cffafe' }, // cyan
+  { fg: '#dc2626', bg: '#fee2e2' }, // red
+  { fg: '#4d7c0f', bg: '#ecfccb' }, // lime
+];
+function personColor(name) {
+  const idx = people.indexOf(name);
+  return PERSON_COLORS[idx % PERSON_COLORS.length];
+}
+
+function addPerson() {
+  const inp = document.getElementById('personName');
+  const name = inp.value.trim();
+  if (!name || people.includes(name)) { inp.value=''; return; }
+  people.push(name);
+  inp.value = '';
+  render();
+}
+function removePerson(name) {
+  people = people.filter(p => p !== name);
+  items.forEach(it => it.assigned.delete(name));
+  render();
+}
+function addItem() {
+  items.push({ id: itemSeq++, name: '', price: 0, assigned: new Set(people.length===1?[people[0]]:[]) });
+  render();
+}
+function removeItem(id) {
+  items = items.filter(it => it.id !== id);
+  render();
+}
+function updateItem(id, field, value) {
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  it[field] = field === 'price' ? (parseFloat(value) || 0) : value;
+}
+function toggleAssign(id, person) {
+  const it = items.find(i => i.id === id);
+  if (!it) return;
+  if (it.assigned.has(person)) it.assigned.delete(person); else it.assigned.add(person);
+  render();
+}
+
+function money(n, symbol) { return (symbol || 'S$') + n.toFixed(2); }
+
+// Rough estimates (SGD per 1 unit) — not live, meant as a starting point only
+const CURRENCY_RATES = {
+  MYR: 0.316, USD: 1.2747, IDR: 0.00008, VND: 0.000051, THB: 0.0364,
+  CNY: 0.177, AUD: 0.83, JPY: 0.0085, KRW: 0.00094, EUR: 1.38, GBP: 1.62
+};
+
+function getCurrencyCode() {
+  const sel = document.getElementById('currencyCode');
+  if (sel.value === 'OTHER') {
+    return (document.getElementById('currencyCodeCustom').value.trim().toUpperCase()) || 'FX';
+  }
+  return sel.value;
+}
+
+function onCurrencyChange() {
+  const sel = document.getElementById('currencyCode');
+  document.getElementById('currencyCodeCustom').style.display = sel.value === 'OTHER' ? 'inline-block' : 'none';
+  if (CURRENCY_RATES[sel.value] != null) {
+    document.getElementById('fxRate').value = CURRENCY_RATES[sel.value];
+  }
+  render();
+}
+
+function toggleField(fieldId, checkboxId) {
+  document.getElementById(fieldId).disabled = !document.getElementById(checkboxId).checked;
+}
+
+function render() {
+  const currencyOn = document.getElementById('currencyOn').checked;
+  document.getElementById('currencyFields').style.display = currencyOn ? 'flex' : 'none';
+  document.getElementById('fxNote').style.display = currencyOn ? 'block' : 'none';
+
+  // people chips
+  const chips = document.getElementById('peopleChips');
+  chips.innerHTML = people.length ? '' : '<span class="empty">No one added yet</span>';
+  people.forEach(p => {
+    const col = personColor(p);
+    const c = document.createElement('span');
+    c.className = 'chip';
+    c.style.background = col.bg;
+    c.style.color = col.fg;
+    c.innerHTML = `${p} <button onclick="removePerson('${p.replace(/'/g,"\\'")}')">✕</button>`;
+    chips.appendChild(c);
+  });
+
+  // items
+  const list = document.getElementById('itemsList');
+  list.innerHTML = '';
+  if (!items.length) {
+    list.innerHTML = '<div class="empty">No items yet — add one below.</div>';
+  }
+  items.forEach(it => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    const assignHtml = people.map(p => {
+      const on = it.assigned.has(p);
+      const col = personColor(p);
+      const style = on ? ` style="background:${col.fg};border-color:${col.fg};color:#fff"` : '';
+      return `<label class="tag ${on ? 'on' : ''}"${style} onclick="event.preventDefault();toggleAssign(${it.id},'${p.replace(/'/g,"\\'")}')">${p}</label>`;
+    }).join('');
+    div.innerHTML = `
+      <div class="item-top">
+        <input type="text" placeholder="Item name" value="${it.name}" oninput="updateItem(${it.id},'name',this.value)">
+        <input type="number" placeholder="${currencyOn ? getCurrencyCode() : 'S$'} price" value="${it.price || ''}" step="0.01" oninput="updateItem(${it.id},'price',this.value);computeAndRenderResults()">
+        <button class="ghost" onclick="removeItem(${it.id})">✕</button>
+      </div>
+      <div class="assign-row">${assignHtml || '<span class="empty">Add friends first</span>'}</div>
+    `;
+    list.appendChild(div);
+  });
+
+  computeAndRenderResults();
+}
+
+function computeAndRenderResults() {
+  const svcOn = document.getElementById('svcOn').checked;
+  const gstOn = document.getElementById('gstOn').checked;
+  const svcPct = svcOn ? (parseFloat(document.getElementById('svcPct').value) || 0) : 0;
+  const gstPct = gstOn ? (parseFloat(document.getElementById('gstPct').value) || 0) : 0;
+  const currencyOn = document.getElementById('currencyOn').checked;
+  const currencyCode = currencyOn ? getCurrencyCode() : 'FX';
+  const fxRate = parseFloat(document.getElementById('fxRate').value) || 0;
+  const symbol = currencyOn ? currencyCode + ' ' : 'S$';
+  const showFx = currencyOn && fxRate > 0;
+
+  const subtotalByPerson = {};
+  people.forEach(p => subtotalByPerson[p] = 0);
+  let billSubtotal = 0;
+
+  items.forEach(it => {
+    const n = it.assigned.size;
+    billSubtotal += it.price;
+    if (n === 0) return;
+    const share = it.price / n;
+    it.assigned.forEach(p => { subtotalByPerson[p] += share; });
+  });
+
+  const tbody = document.querySelector('#resultsTable tbody');
+  tbody.innerHTML = `<tr><th>Person</th><th>Subtotal</th><th>Service</th><th>GST</th><th>Total</th>${showFx ? '<th>≈ SGD</th>' : ''}</tr>`;
+
+  let grandSubtotal = 0, grandSvc = 0, grandGst = 0, grandTotal = 0;
+
+  people.forEach(p => {
+    const sub = subtotalByPerson[p] || 0;
+    const svc = sub * svcPct / 100;
+    const gstBase = sub;
+    const gst = gstBase * gstPct / 100;
+    const total = sub + svc + gst;
+    grandSubtotal += sub; grandSvc += svc; grandGst += gst; grandTotal += total;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p}</td><td>${money(sub, symbol)}</td><td>${money(svc, symbol)}</td><td>${money(gst, symbol)}</td><td><strong>${money(total, symbol)}</strong></td>${showFx ? `<td>S$${(total * fxRate).toFixed(2)}</td>` : ''}`;
+    tbody.appendChild(tr);
+  });
+
+  const unassigned = billSubtotal - grandSubtotal;
+  const gt = document.getElementById('grandTotals');
+  gt.innerHTML = `
+    ${unassigned > 0.005 ? `<div class="total-line" style="color:var(--danger)">Unassigned items: ${money(unassigned, symbol)} — assign to someone above</div>` : ''}
+    <div class="total-line"><span>Subtotal</span><span>${money(grandSubtotal, symbol)}</span></div>
+    <div class="total-line"><span>Service charge (${svcPct}%)</span><span>${money(grandSvc, symbol)}</span></div>
+    <div class="total-line"><span>GST (${gstPct}%)</span><span>${money(grandGst, symbol)}</span></div>
+    <div class="total-line grand"><span>Bill total</span><span>${money(grandTotal, symbol)}</span></div>
+    ${showFx ? `<div class="total-line grand"><span>≈ Total in SGD</span><span>S$${(grandTotal * fxRate).toFixed(2)}</span></div>` : ''}
+  `;
+}
+
+// restore last session (per-device convenience only)
+try {
+  const saved = JSON.parse(localStorage.getItem('splitbill-state') || 'null');
+  if (saved) {
+    people = saved.people || [];
+    items = (saved.items || []).map(it => ({...it, assigned: new Set(it.assigned)}));
+    itemSeq = saved.itemSeq || items.length;
+    if (saved.svcPct != null) document.getElementById('svcPct').value = saved.svcPct;
+    if (saved.gstPct != null) document.getElementById('gstPct').value = saved.gstPct;
+    if (saved.svcOn != null) document.getElementById('svcOn').checked = saved.svcOn;
+    if (saved.gstOn != null) document.getElementById('gstOn').checked = saved.gstOn;
+    if (saved.currencyOn != null) document.getElementById('currencyOn').checked = saved.currencyOn;
+    if (saved.currencyCodeSelect != null) document.getElementById('currencyCode').value = saved.currencyCodeSelect;
+    if (saved.currencyCodeCustom != null) document.getElementById('currencyCodeCustom').value = saved.currencyCodeCustom;
+    document.getElementById('currencyCodeCustom').style.display = document.getElementById('currencyCode').value === 'OTHER' ? 'inline-block' : 'none';
+    if (saved.fxRate != null) document.getElementById('fxRate').value = saved.fxRate;
+    toggleField('svcPct','svcOn');
+    toggleField('gstPct','gstOn');
+  }
+} catch (e) { /* ignore */ }
+
+function persist() {
+  try {
+    localStorage.setItem('splitbill-state', JSON.stringify({
+      people, itemSeq,
+      items: items.map(it => ({...it, assigned: Array.from(it.assigned)})),
+      svcPct: document.getElementById('svcPct').value,
+      gstPct: document.getElementById('gstPct').value,
+      svcOn: document.getElementById('svcOn').checked,
+      gstOn: document.getElementById('gstOn').checked,
+      currencyOn: document.getElementById('currencyOn').checked,
+      currencyCodeSelect: document.getElementById('currencyCode').value,
+      currencyCodeCustom: document.getElementById('currencyCodeCustom').value,
+      fxRate: document.getElementById('fxRate').value
+    }));
+  } catch (e) { /* ignore */ }
+}
+setInterval(persist, 1500);
+
+render();
+</script>
+</body>
+</html>
